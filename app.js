@@ -5,46 +5,60 @@ function Book(title, author, isbn) {
   this.isbn = isbn;
 }
 
-// UI constructor
+// UI contructor
 function UI() { }
 
-UI.prototype.addBookToList = function (book) {
-  const list = document.getElementById('book-list');
-  // create element
+UI.prototype.addToList = function (book) {
+  const list = document.querySelector('#book-list');
   const row = document.createElement('tr');
-  // insert cols
   row.innerHTML = `
   <td>${book.title}</td>
   <td>${book.author}</td>
   <td>${book.isbn}</td>
-  <td><a href='#' class='delete'>X</a></td>
+  <td><a class='delete'>X</a></td>
   `
   list.appendChild(row);
 }
 
 UI.prototype.clearFields = function () {
-  document.getElementById('title').value === '';
-  document.getElementById('author').value === '';
-  document.getElementById('isbn').value === '';
+  document.getElementById('title').value = '';
+  document.getElementById('author').value = '';
+  document.getElementById('isbn').value = '';
 }
 
-// Event Listeners
-document.getElementById('book-form').addEventListener('submit', function (e) {
-  const title = document.getElementById('title').value,
-    author = document.getElementById('author').value,
-    isbn = document.getElementById('isbn').value
+UI.prototype.showAlert = function (message, className) {
+  const div = document.createElement('div');
+  div.className = `alert ${className}`;
+  div.appendChild(document.createTextNode(message));
+  const container = document.querySelector('.container');
+  const form = document.querySelector('#book-form');
+  container.insertBefore(div, form);
 
-  // instantiate book
+  // timeout after 3 seconds
+  setTimeout(function () {
+    document.querySelector('.alert').remove();
+
+  }, 3000);
+
+}
+
+document.addEventListener('submit', e => {
+
+  const title = document.getElementById('title').value;
+  const author = document.getElementById('author').value;
+  const isbn = document.getElementById('isbn').value;
+
+
   const book = new Book(title, author, isbn);
-
-  // instantiate ui
   const ui = new UI();
-
-  // Add book to list
-  ui.addBookToList(book);
-
-  // clear fields
-  ui.clearFields();
+  if (title !== '' && author !== '' && isbn !== '') {
+    ui.addToList(book);
+    ui.clearFields();
+    ui.showAlert('Book Added!', 'success');
+  } else {
+    ui.showAlert('Please Fill in the fields', 'error');
+  }
 
   e.preventDefault();
-});
+
+})
